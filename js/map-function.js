@@ -144,15 +144,15 @@ function display_heatmap(url, width, height){
 */
 
 function display_map(map_url, width, height) {
-    bounds = new OpenLayers.Bounds(0, -1 * height, width, 0);
+    bounds = new OpenLayers.Bounds(0, (-1 * height), width, 0);
     map_options = {
         controls:[
             new OpenLayers.Control.Navigation(),
             new OpenLayers.Control.PanZoomBar(),
                 ],
         maxExtent: bounds,
-        numZoomLevels: 10,
-        fractionalZoom: true,
+        numZoomLevels: 6,
+        fractionalZoom: false,
     }
     map = new OpenLayers.Map ("map", map_options);
 
