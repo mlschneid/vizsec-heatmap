@@ -38,7 +38,7 @@ function get_all_labels(parent_node){
     
     parent_node.find('.node').each(function(index){
         labels.push($(this).children('text').text());
-        console.debug($(this).children('text').text());
+        //console.debug($(this).children('text').text());
     });
 
     return labels;
@@ -65,14 +65,14 @@ function highlight_node(name, radius, intensity) {
         heatmap.addSource(new Heatmap.Source(new OpenLayers.LonLat(transformed_point.x, -1*transformed_point.y), radius, intensity));
         }
     else {
-        console.debug('node not found:');
-        console.debug(name);
+        //console.debug('node not found:');
+        //console.debug(name);
     }
 }
 
 function display_heatmap(csvContent){
     heatmap = new Heatmap.Layer("Heatmap");
-    heatmap.defaultRadius = 20;
+    heatmap.defaultRadius = 30;
     heatmap.defaultIntensity = 0.1;
     heatmap.setOpacity(0.8);
 
@@ -81,7 +81,6 @@ function display_heatmap(csvContent){
     for(var i = 0; i < csvNormalized.length; i++){
         nodeId = csvNormalized[i][0];
         intensityValue = csvNormalized[i][1];
-        console.log(csvNormalized[i][1]);
         highlight_node(nodeId, heatmap.defaultRadius, intensityValue);
     }
 
@@ -91,7 +90,7 @@ function display_heatmap(csvContent){
 }
 
 function normalize(csvContent){
-    max = 0.0;
+    max = -1000.0;
     min = 1000.0;
     for(var i = 0; i < csvContent.length; i++){
         if (max < csvContent[i][1]){
@@ -102,11 +101,14 @@ function normalize(csvContent){
         }
     }
 
+    console.log(max);
+    console.log(min);
+
     normalized = [];
     for(var i = 0; i < csvContent.length; i++){
-        normalized.push([csvContent[i][0], (csvContent[i][0] - min)/(max - min)]);
+        normalized.push([csvContent[i][0], ((csvContent[i][1] - min)/(max - min))*100]);
         //normalized[i][0] = csvContent[i][0];
-        //normalized[i][1] = (csvContent[i][0] - min)/(max - min);
+        //normalized[i][1] = (csvContent[i][1] - min)/(max - min);
     }
 
     return normalized;
