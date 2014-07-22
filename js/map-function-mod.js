@@ -75,8 +75,7 @@ function highlight_node(name, radius, intensity) {
 
 
 function display_heatmap(csvContent, max){
-    var transformedTestData = { max: max, data:[] };
-
+    var transformedTestData = { max: 10, data:[] };
 
     layer = new OpenLayers.Layer.OSM();
     heatmap = new OpenLayers.Layer.Heatmap("Heatmap",
@@ -85,11 +84,8 @@ function display_heatmap(csvContent, max){
             {isBaseLayer: false, opacity: 0.8}
     );
 
-    csvNormalized = normalize(csvContent, 10);
+    csvNormalized = normalize(csvContent, 500);
 
-    for(var i = 0; i < csvNormalized.length; i++){
-        console.log(csvNormalized[i][1]);
-    }
     for(var i = 0; i < csvNormalized.length; i++){
         nodeId = csvNormalized[i][0];
         intensityValue = csvNormalized[i][1];
@@ -130,37 +126,6 @@ function normalize(csvContent, scalar = 1){
     return normalized;
 }
 
-/*
-function display_heatmap(url, width, height){
-    // avoid race condition: check if svg has been initialized yet before trying to draw terms
-    var svg = $('svg');
-    if (svg.length == 0) {
-        delay += delta_delay;
-        setTimeout(function() {display_heatmap(url, width, height);}, delay);
-    }
-    heatmap = new Heatmap.Layer("Heatmap");
-    heatmap.defaultRadius = 20;
-    heatmap.defaultIntensity = 0.1;
-    heatmap.setOpacity(0.8);
-
-    $.ajax({ url: url, success: function(heatmap_data) 
-        { 
-            parent_node = $('<output>').append($.parseHTML(heatmap_data)).find('svg');
-            //svg = $('<output> svg')[0];
-            var list = get_all_labels(parent_node);
-            
-            for(var i in list){
-                highlight_node(list[i], heatmap.defaultRadius, heatmap.intensity);
-            }
-
-            map.addLayers([heatmap]);
-            map.zoomToExtent(bounds);
-
-        } 
-    });
-}
-*/
-
 function display_map(map_url, width, height) {
     bounds = new OpenLayers.Bounds(0, (-1 * height), width, 0);
     map_options = {
@@ -170,7 +135,7 @@ function display_map(map_url, width, height) {
                 ],
         maxExtent: bounds,
         numZoomLevels: 6,
-        fractionalZoom: false,
+        fractionalZoom: true,
     }
     map = new OpenLayers.Map ("map", map_options);
 
@@ -191,56 +156,6 @@ function display_map(map_url, width, height) {
     map.zoomToExtent(bounds);
 }
 
-/*
-function display_map_with_zoom(map_urls, width, height) {
-    var bounds = new OpenLayers.Bounds(0, -1 * height, width, 0);
-    map_options = {
-        controls:[
-            new OpenLayers.Control.Navigation(),
-            new OpenLayers.Control.PanZoomBar(),
-                ],
-        maxExtent: bounds,
-        numZoomLevels: 6,
-        fractionalZoom: true,
-    }
-    map = new OpenLayers.Map ("map", map_options);
-
-    var gmaps = new Array();
-    for (var i = 0; i < ZOOM_LEVELS; i++)
-    {
-        var gmap = new OpenLayers.Layer.ScalableInlineXhtml(
-            "GMap",
-            map_urls[i],
-            bounds,
-            null,
-            {isBaseLayer: true, opacity: '1.0'});
-	    gmap.adjustBounds(bounds);
-
-	    gmaps.push(gmap);
-    }
-
-    var svg = $('svg');
-    map.addLayers(gmaps);
-	for (var i = 0; i < gmaps.length; i++)
-		gmaps[i].setVisibility(false);
-    map.zoomToExtent(bounds);
-
-    var curZoom = getZoomSafe(0, gmaps.length - 1, map.getZoom());
-    gmaps[curZoom].setVisibility(true);
-
-	map.events.register("zoomend", map, function() {
-		zoom = map.getZoom();
-	    for (var i = 0; i < gmaps.length; i++)
-	    	gmaps[i].setVisibility(false);
-
-	    zoom = getZoomSafe(0, gmaps.length - 1, map.getZoom());
-		gmaps[zoom].setVisibility(true);
-        rescale_heatmap();
-	});
-
-}
-*/
-
 function rescale_heatmap() {
     if (heatmap) {
         heatmap.defaultRadius = heatmap_scaling_factor * map.zoom;
@@ -255,4 +170,3 @@ function getZoomSafe(lower, upper, value)
     zoom = Math.min(upper, zoom);
     return zoom;
 }
-
