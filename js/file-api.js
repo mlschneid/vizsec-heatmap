@@ -45,7 +45,7 @@ window.addEvent('domready', function() {
                 //state.innerHTML = 'Already loaded a map!';
                 csvfile = event.target.result;
                 csvArray = $.csv.toArrays(csvfile);
-                display_heatmap(csvArray, csvArray.length);
+                display_heatmap(csvArray, csvArray.length/10);
             }
 
         };

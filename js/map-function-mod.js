@@ -85,8 +85,11 @@ function display_heatmap(csvContent, max){
             {isBaseLayer: false, opacity: 0.8}
     );
 
-    csvNormalized = normalize(csvContent, 100);
+    csvNormalized = normalize(csvContent, 10);
 
+    for(var i = 0; i < csvNormalized.length; i++){
+        console.log(csvNormalized[i][1]);
+    }
     for(var i = 0; i < csvNormalized.length; i++){
         nodeId = csvNormalized[i][0];
         intensityValue = csvNormalized[i][1];
@@ -102,7 +105,7 @@ function display_heatmap(csvContent, max){
     //rescale_heatmap();
 }
 
-function normalize(csvContent, upperlimit = 1){
+function normalize(csvContent, scalar = 1){
     max = -1000.0;
     min = 1000.0;
     for(var i = 0; i < csvContent.length; i++){
@@ -119,7 +122,7 @@ function normalize(csvContent, upperlimit = 1){
 
     normalized = [];
     for(var i = 0; i < csvContent.length; i++){
-        normalized.push([csvContent[i][0], ((csvContent[i][1] - min)/(max - min))*upperlimit]);
+        normalized.push([csvContent[i][0], ((csvContent[i][1] - min)/(max - min))*scalar]);
         //normalized[i][0] = csvContent[i][0];
         //normalized[i][1] = (csvContent[i][1] - min)/(max - min);
     }
@@ -181,10 +184,14 @@ function display_map(map_url, width, height) {
     var svg = $('svg');
     gmapLayer.adjustBounds(bounds);
 
+    mapDiv = document.getElementById("map");
+    mapDiv.height = height;
+
     map.addLayers([gmapLayer]);
     map.zoomToExtent(bounds);
 }
 
+/*
 function display_map_with_zoom(map_urls, width, height) {
     var bounds = new OpenLayers.Bounds(0, -1 * height, width, 0);
     map_options = {
@@ -232,6 +239,7 @@ function display_map_with_zoom(map_urls, width, height) {
 	});
 
 }
+*/
 
 function rescale_heatmap() {
     if (heatmap) {
