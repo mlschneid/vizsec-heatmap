@@ -44,7 +44,8 @@ window.addEvent('domready', function() {
             else { //load heatmap
                 //state.innerHTML = 'Already loaded a map!';
                 csvfile = event.target.result;
-                display_heatmap($.csv.toArrays(csvfile));
+                csvArray = $.csv.toArrays(csvfile);
+                display_heatmap(csvArray, csvArray.length);
             }
 
         };
