@@ -132,6 +132,7 @@ function normalize(csvContent, scalar = 1){
 }
 
 function display_map(map_url, width, height) {
+
     bounds = new OpenLayers.Bounds(0, (-1 * height), width, 0);
     map_options = {
         controls:[
@@ -153,9 +154,6 @@ function display_map(map_url, width, height) {
 
     var svg = $('svg');
     gmapLayer.adjustBounds(bounds);
-
-    mapDiv = document.getElementById("map");
-    mapDiv.height = height;
 
     map.addLayers([gmapLayer]);
     map.zoomToExtent(bounds);
