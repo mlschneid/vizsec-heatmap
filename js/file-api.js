@@ -33,18 +33,15 @@ window.addEvent('domready', function() {
             if (mapLoaded == false) { //load map
                 svgfile = event.target.result;
                 tempWidth = $(svgfile)[6].width.baseVal.value;
-                console.debug(tempWidth);
                 tempHeight = $(svgfile)[6].height.baseVal.value;
-                console.debug(tempHeight);
-                //display_map(file.name, tempWidth, tempHeight);
                 display_map(file.name, 3561, 3012);
                 mapLoaded = true;
                 state.innerHTML = 'And now your heatmap!';
             }
             else { //load heatmap
-                //state.innerHTML = 'Already loaded a map!';
                 csvfile = event.target.result;
                 csvArray = $.csv.toArrays(csvfile);
+                clear_heatmap();
                 display_heatmap(csvArray, csvArray.length/10);
             }
 

@@ -16,9 +16,9 @@ function opacity_slider_change(event, ui) {
 
 var bounds;
 var gmapLayer;
-var heatmap;
+var osm_layer;
+var heatmap_layer;
 var parent_node;
-var layer;
 var data = [];
 
 var ZOOM_LEVELS = 4;
@@ -67,38 +67,43 @@ function highlight_node(name, radius, intensity) {
         data.push({lonlat: new OpenLayers.LonLat(transformed_point.x, -1*transformed_point.y),
                     count: intensity});
     }
-    else {
-        //console.debug('node not found:');
-        //console.debug(name);
+}
+
+function clear_heatmap(){
+    if(osm_layer){
+        map.layers[1].destroy();
+    }
+    if(heatmap_layer){
+        map.layers[2].destroy();
     }
 }
 
 
-function display_heatmap(csvContent, max){
-    var transformedTestData = { max: 10, data:[] };
 
-    layer = new OpenLayers.Layer.OSM();
-    heatmap = new OpenLayers.Layer.Heatmap("Heatmap",
-            map, layer,
-            {visible: true, radius:20},
-            {isBaseLayer: false, opacity: 0.8}
+function display_heatmap(csvContent, max){
+
+    var transformedData = { max: max, data:[] };
+
+    osm_layer = new OpenLayers.Layer.OSM("heatmap-layer");
+    heatmap_layer = new OpenLayers.Layer.Heatmap("heatmap",
+            map, osm_layer,
+            {visible: true, radius:30},
+            {isBaseLayer: false, opacity: 0.7}
     );
 
-    csvNormalized = normalize(csvContent, 500);
+    csvNormalized = normalize(csvContent, 800);
 
     for(var i = 0; i < csvNormalized.length; i++){
         nodeId = csvNormalized[i][0];
         intensityValue = csvNormalized[i][1];
-        highlight_node(nodeId, heatmap.defaultRadius, intensityValue);
+        highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue);
     }
 
-    map.addLayers([layer, heatmap]);
+    map.addLayers([osm_layer, heatmap_layer]);
     map.zoomToMaxExtent();
 
-    transformedTestData.data = data;
-    heatmap.setDataSet(transformedTestData);
-
-    //rescale_heatmap();
+    transformedData.data = data;
+    heatmap_layer.setDataSet(transformedData);
 }
 
 function normalize(csvContent, scalar = 1){
@@ -157,9 +162,9 @@ function display_map(map_url, width, height) {
 }
 
 function rescale_heatmap() {
-    if (heatmap) {
-        heatmap.defaultRadius = heatmap_scaling_factor * map.zoom;
-        heatmap.redraw();
+    if (heatmap_layer) {
+        heatmap_layer.defaultRadius = heatmap_scaling_factor * map.zoom;
+        heatmap_layer.redraw();
     }
 }
 
