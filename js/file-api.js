@@ -27,7 +27,7 @@ window.addEvent('domready', function() {
         e.preventDefault();
         var minHeatValue = document.getElementById("minHeatValue").value;
         var maxHeatValue = document.getElementById("maxHeatValue").value;
-        var intensityScalar = document.getElementById("scalar").value;
+        //var intensityScalar = document.getElementById("scalar").value;
 
         var file = e.dataTransfer.files[0],
             reader = new FileReader();
@@ -47,7 +47,8 @@ window.addEvent('domready', function() {
             else { //load heatmap
                 csvfile = event.target.result;
                 csvArray = $.csv.toArrays(csvfile);
-                populate_heatmap(csvArray, csvArray.length, intensityScalar, minHeatValue, maxHeatValue);
+                populate_heatmap(csvArray, minHeatValue, maxHeatValue);
+                //populate_heatmap(csvArray, csvArray.length, intensityScalar, minHeatValue, maxHeatValue);
             }
 
         };
