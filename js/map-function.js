@@ -18,6 +18,7 @@ var bounds;
 var gmapLayer;
 var osm_layer;
 var heatmap_layer;
+var heatmap_points = [];
 var parent_node;
 var data = [];
 
@@ -51,6 +52,7 @@ function highlight_node(name, radius, intensity) {
 
     var svg = $('svg')[0];
     var pt = svg.createSVGPoint();
+    //heatmap_points.push(pt);
 
     var node = get_node(name);
     if (node.length > 0) {
@@ -67,15 +69,8 @@ function highlight_node(name, radius, intensity) {
         data.push({lonlat: new OpenLayers.LonLat(transformed_point.x, -1*transformed_point.y),
                     count: intensity});
     }
-}
 
-function clear_heatmap(){
-    if(heatmap_layer){
-        map.layers[2].destroy();
-    }
-    if(osm_layer){
-        map.layers[1].destroy();
-    }
+    pt.empty();
 }
 
 function add_heatmap(){
@@ -91,42 +86,23 @@ function add_heatmap(){
 }
 
 function populate_heatmap(csvContent, max, scalar){
-
+    if(heatmap_points.length > 0){
+        for(var i = 0; i < heatmap_points.length; i++){
+            heatmap_points[i].remove();
+        }
+    }
+    heatmap_points = [];
     var transformedData = { max: max, data:[] };
 
     for(var i = 0; i < csvContent.length; i++){
-        nodeId = csvContent[i][0];
-        intensityValue = csvContent[i][1];
+        var nodeId = csvContent[i][0];
+        var intensityValue = csvContent[i][1];
         highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue * scalar);
     }
 
     transformedData.data = data;
     heatmap_layer.setDataSet(transformedData);
-}
-
-function normalize(csvContent, scalar){
-    max = -1000.0;
-    min = 1000.0;
-    for(var i = 0; i < csvContent.length; i++){
-        if (max < csvContent[i][1]){
-            max = csvContent[i][1];
-        }
-        if (min > csvContent[i][1]){
-            min = csvContent[i][1];
-        }
-    }
-
-    console.log(max);
-    console.log(min);
-
-    normalized = [];
-    for(var i = 0; i < csvContent.length; i++){
-        normalized.push([csvContent[i][0], ((csvContent[i][1] - min)/(max - min))*scalar]);
-        //normalized[i][0] = csvContent[i][0];
-        //normalized[i][1] = (csvContent[i][1] - min)/(max - min);
-    }
-
-    return normalized;
+    heatmap_layer.redraw();
 }
 
 function display_map(map_url, width, height) {
