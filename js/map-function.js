@@ -97,7 +97,7 @@ function populate_heatmap(csvContent, minHeat, maxHeat){
     for(var i = 0; i < csvContent.length; i++){
         var nodeId = csvContent[i][0];
         var intensityValue = csvContent[i][1];
-        if (intensityValue > minHeat && intensityValue < maxHeat)
+        if (intensityValue >= minHeat && intensityValue <= maxHeat)
         {
             highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue);
         }
