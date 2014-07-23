@@ -25,6 +25,8 @@ window.addEvent('domready', function() {
     holder.ondrop = function (e) {
         this.className = '';
         e.preventDefault();
+        var minHeatValue = document.getElementById("minHeatValue").value;
+        var maxHeatValue = document.getElementById("maxHeatValue").value;
 
         var file = e.dataTransfer.files[0],
             reader = new FileReader();
@@ -44,7 +46,7 @@ window.addEvent('domready', function() {
             else { //load heatmap
                 csvfile = event.target.result;
                 csvArray = $.csv.toArrays(csvfile);
-                populate_heatmap(csvArray, csvArray.length, 200);
+                populate_heatmap(csvArray, csvArray.length, 200, minHeatValue, maxHeatValue);
             }
 
         };

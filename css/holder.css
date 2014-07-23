@@ -5,7 +5,7 @@ body {
     border: 10px dashed #ccc;
     width: 300px;
     height: 100px;
-    margin: 20px auto;
+    margin: -120px auto 0px;
 }
 #holder.hover {
     border: 10px dashed #333;
@@ -15,4 +15,9 @@ body {
     text-align: center;
     padding-top: 10px;
 }
+
+#opacity { display:block-inline; }
+
+#minMax { display:block-inline; padding-left:10px;}
+#minMax input { display:block; }
 

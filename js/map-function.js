@@ -85,7 +85,7 @@ function add_heatmap(){
     map.zoomToMaxExtent();
 }
 
-function populate_heatmap(csvContent, max, scalar){
+function populate_heatmap(csvContent, max, scalar, minHeat, maxHeat){
     if(heatmap_points.length > 0){
         for(var i = 0; i < heatmap_points.length; i++){
             heatmap_points[i].remove();
@@ -97,7 +97,10 @@ function populate_heatmap(csvContent, max, scalar){
     for(var i = 0; i < csvContent.length; i++){
         var nodeId = csvContent[i][0];
         var intensityValue = csvContent[i][1];
-        highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue * scalar);
+        if (intensityValue > minHeat && intensityValue < maxHeat)
+        {
+            highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue * scalar);
+        }
     }
 
     transformedData.data = data;
