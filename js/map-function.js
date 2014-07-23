@@ -70,7 +70,7 @@ function highlight_node(name, radius, intensity) {
                     count: intensity});
     }
 
-    pt.empty();
+    //pt.empty();
 }
 
 function add_heatmap(){
