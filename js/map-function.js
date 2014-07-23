@@ -78,12 +78,7 @@ function clear_heatmap(){
     }
 }
 
-
-
-function display_heatmap(csvContent, max, scalar){
-
-    var transformedData = { max: max, data:[] };
-
+function add_heatmap(){
     osm_layer = new OpenLayers.Layer.OSM("heatmap-layer");
     heatmap_layer = new OpenLayers.Layer.Heatmap("heatmap",
             map, osm_layer,
@@ -91,14 +86,19 @@ function display_heatmap(csvContent, max, scalar){
             {isBaseLayer: false, opacity: 0.7}
     );
 
+    map.addLayers([osm_layer, heatmap_layer]);
+    map.zoomToMaxExtent();
+}
+
+function populate_heatmap(csvContent, max, scalar){
+
+    var transformedData = { max: max, data:[] };
+
     for(var i = 0; i < csvContent.length; i++){
         nodeId = csvContent[i][0];
         intensityValue = csvContent[i][1];
         highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue * scalar);
     }
-
-    map.addLayers([osm_layer, heatmap_layer]);
-    map.zoomToMaxExtent();
 
     transformedData.data = data;
     heatmap_layer.setDataSet(transformedData);

@@ -37,14 +37,14 @@ window.addEvent('domready', function() {
                 map.style.width = tempWidth;
                 map.style.height = tempHeight;
                 display_map(file.name, tempWidth, tempHeight);
+                add_heatmap();
                 mapLoaded = true;
                 state.innerHTML = 'And now your heatmap!';
             }
             else { //load heatmap
                 csvfile = event.target.result;
                 csvArray = $.csv.toArrays(csvfile);
-                clear_heatmap();
-                display_heatmap(csvArray, csvArray.length, 200);
+                populate_heatmap(csvArray, csvArray.length, 200);
             }
 
         };
