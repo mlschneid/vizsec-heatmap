@@ -80,7 +80,7 @@ function clear_heatmap(){
 
 
 
-function display_heatmap(csvContent, max){
+function display_heatmap(csvContent, max, scalar){
 
     var transformedData = { max: max, data:[] };
 
@@ -91,12 +91,10 @@ function display_heatmap(csvContent, max){
             {isBaseLayer: false, opacity: 0.7}
     );
 
-    csvNormalized = normalize(csvContent, 800);
-
-    for(var i = 0; i < csvNormalized.length; i++){
-        nodeId = csvNormalized[i][0];
-        intensityValue = csvNormalized[i][1];
-        highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue);
+    for(var i = 0; i < csvContent.length; i++){
+        nodeId = csvContent[i][0];
+        intensityValue = csvContent[i][1];
+        highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue * scalar);
     }
 
     map.addLayers([osm_layer, heatmap_layer]);

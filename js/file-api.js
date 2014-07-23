@@ -43,8 +43,8 @@ window.addEvent('domready', function() {
             else { //load heatmap
                 csvfile = event.target.result;
                 csvArray = $.csv.toArrays(csvfile);
-                display_heatmap(csvArray, csvArray.length/10);
                 clear_heatmap();
+                display_heatmap(csvArray, csvArray.length, 200);
             }
 
         };
