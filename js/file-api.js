@@ -34,9 +34,6 @@ window.addEvent('domready', function() {
                 svgfile = event.target.result;
                 tempWidth = $(svgfile)[6].viewBox.baseVal.width;
                 tempHeight = $(svgfile)[6].viewBox.baseVal.height;
-                //tempWidth = $(svgfile)[6].width.baseVal.value;
-                //tempHeight = $(svgfile)[6].height.baseVal.value;
-                //
                 map.style.width = tempWidth;
                 map.style.height = tempHeight;
                 display_map(file.name, tempWidth, tempHeight);
@@ -46,8 +43,8 @@ window.addEvent('domready', function() {
             else { //load heatmap
                 csvfile = event.target.result;
                 csvArray = $.csv.toArrays(csvfile);
-                clear_heatmap();
                 display_heatmap(csvArray, csvArray.length/10);
+                clear_heatmap();
             }
 
         };

@@ -70,11 +70,11 @@ function highlight_node(name, radius, intensity) {
 }
 
 function clear_heatmap(){
-    if(osm_layer){
-        map.layers[1].destroy();
-    }
     if(heatmap_layer){
         map.layers[2].destroy();
+    }
+    if(osm_layer){
+        map.layers[1].destroy();
     }
 }
 
@@ -106,7 +106,7 @@ function display_heatmap(csvContent, max){
     heatmap_layer.setDataSet(transformedData);
 }
 
-function normalize(csvContent, scalar = 1){
+function normalize(csvContent, scalar){
     max = -1000.0;
     min = 1000.0;
     for(var i = 0; i < csvContent.length; i++){
