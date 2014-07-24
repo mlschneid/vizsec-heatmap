@@ -18,9 +18,7 @@ var bounds;
 var gmapLayer;
 var osm_layer;
 var heatmap_layer;
-var heatmap_points = [];
 var parent_node;
-var data = [];
 
 var ZOOM_LEVELS = 4;
 
@@ -52,7 +50,6 @@ function highlight_node(name, radius, intensity) {
 
     var svg = $('svg')[0];
     var pt = svg.createSVGPoint();
-    //heatmap_points.push(pt);
 
     var node = get_node(name);
     if (node.length > 0) {
@@ -86,12 +83,8 @@ function add_heatmap(){
 }
 
 function populate_heatmap(csvContent, minHeat, maxHeat){
-    if(heatmap_points.length > 0){
-        for(var i = 0; i < heatmap_points.length; i++){
-            heatmap_points[i].remove();
-        }
-    }
-    heatmap_points = [];
+    data = [];
+    
     var transformedData = { max: 1, data:[] };
 
     for(var i = 0; i < csvContent.length; i++){
