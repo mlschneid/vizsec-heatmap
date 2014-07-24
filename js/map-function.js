@@ -19,6 +19,7 @@ var gmapLayer;
 var osm_layer;
 var heatmap_layer;
 var parent_node;
+var nodes = {};
 
 var ZOOM_LEVELS = 4;
 
@@ -27,11 +28,15 @@ var heatmap_scaling_factor = 25;
 var delay = 0;
 var delta_delay = 500;
 
+function get_all_nodes(){
+    $('svg').find('.node').each(function(index){
+        var title = $(this).children('title').text();
+        nodes[title] = $(this);
+    }); 
+}
+
 function get_node(text) {
-    return $(".node").filter(function() {
-            //return $(this).children('text').text() == text;
-            return $(this).children('title').text() == text;
-    });
+    return nodes[text];
 }
 
 function get_all_labels(parent_node){
@@ -39,7 +44,6 @@ function get_all_labels(parent_node){
     
     parent_node.find('.node').each(function(index){
         labels.push($(this).children('text').text());
-        //console.debug($(this).children('text').text());
     });
 
     return labels;
@@ -52,7 +56,7 @@ function highlight_node(name, radius, intensity) {
     var pt = svg.createSVGPoint();
 
     var node = get_node(name);
-    if (node.length > 0) {
+    if (node) {
         var text_element = node.children('text').first();
         var x = text_element.attr('x');
         var y = text_element.attr('y');
@@ -66,8 +70,6 @@ function highlight_node(name, radius, intensity) {
         data.push({lonlat: new OpenLayers.LonLat(transformed_point.x, -1*transformed_point.y),
                     count: intensity});
     }
-
-    //pt.empty();
 }
 
 function add_heatmap(){
@@ -84,7 +86,8 @@ function add_heatmap(){
 
 function populate_heatmap(csvContent, minHeat, maxHeat){
     data = [];
-    
+    get_all_nodes();
+
     var transformedData = { max: 1, data:[] };
 
     for(var i = 0; i < csvContent.length; i++){
