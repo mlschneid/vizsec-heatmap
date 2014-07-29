@@ -20,6 +20,7 @@ var osm_layer;
 var heatmap_layer;
 var parent_node;
 var nodes = {};
+var unknown_value = 0; //keeps track of greatest heatmap value that belongs to "Unknown" country.
 
 var ZOOM_LEVELS = 4;
 
@@ -70,6 +71,11 @@ function highlight_node(name, radius, intensity) {
         data.push({lonlat: new OpenLayers.LonLat(transformed_point.x, -1*transformed_point.y),
                     count: intensity});
     }
+    else {
+        if (unknown_value < intensity) {
+            unknown_value = intensity;
+        }
+    }
 }
 
 function add_heatmap(){
@@ -97,6 +103,10 @@ function populate_heatmap(csvContent, minHeat, maxHeat){
         {
             highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue);
         }
+    }
+    if (intensityValue >= minHeat && intensityValue <= maxHeat)
+    {
+        highlight_node("Unknown", heatmap_layer.defaultRadius, unknown_value);
     }
 
     transformedData.data = data;
@@ -146,3 +156,4 @@ function getZoomSafe(lower, upper, value)
     zoom = Math.min(upper, zoom);
     return zoom;
 }
+
