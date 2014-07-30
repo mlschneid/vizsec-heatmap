@@ -25,24 +25,36 @@ window.addEvent('domready', function() {
         this.className = '';
         e.preventDefault();
 
+        var canvas;
+        var heat_div = document.createElement('div');
+        heat_div.id = "heat-title";
+        var heat_title;
+
         var reader = new FileReader();
         var files = e.dataTransfer.files;
         if(files.length == 1){
-            var file = files[0]; 
+            var file = files[0];
             reader.readAsText(file);
             reader.onload = function (event) {
                 svgfile = event.target.result;
+
                 tempWidth = $(svgfile)[6].viewBox.baseVal.width;
                 tempHeight = $(svgfile)[6].viewBox.baseVal.height;
                 map.style.width = tempWidth;
                 map.style.height = tempHeight;
+
                 display_map(file.name, tempWidth, tempHeight);
+
                 add_heatmap();
+
+                canvas = document.getElementsByTagName("canvas")[0];
+                canvas.parentNode.appendChild(heat_div);
+
                 mapLoaded = true;
                 state.innerHTML = 'And now your heatmaps!';
             };
         }
-        else      
+        else
         {
             var i = 0;
             var intervalHandle = setInterval(function() {
@@ -52,14 +64,15 @@ window.addEvent('domready', function() {
                     clearInterval(intervalHandle);
                 }
             }, interval);
-            
+
             function processCSV(){
                 var file = files[i];
-                console.log(file);
                 reader.readAsText(file);
                 reader.onload = function (event) {
-                    csvfile = event.target.result;
+                    var csvfile = event.target.result;
                     csvArray = $.csv.toArrays(csvfile);
+                    heat_title = document.getElementById("heat-title");
+                    heat_title.innerHTML = file.name.split(".")[0];
                     populate_heatmap(csvArray, 0.05, 1.0);
                 };
             }
