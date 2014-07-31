@@ -123,7 +123,7 @@ function display_map(map_url, width, height) {
             new OpenLayers.Control.PanZoomBar(),
                 ],
         maxExtent: bounds,
-        numZoomLevels: 8,
+        numZoomLevels: 10,
         fractionalZoom: true,
     }
     map = new OpenLayers.Map ("map", map_options);
