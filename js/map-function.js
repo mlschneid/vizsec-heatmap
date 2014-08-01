@@ -104,7 +104,7 @@ function populate_heatmap(csvContent, minHeat, maxHeat){
             highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue);
         }
     }
-    if (intensityValue >= minHeat && intensityValue <= maxHeat)
+    if (unknown_value >= minHeat && unknown_value <= maxHeat)
     {
         highlight_node("Unknown", heatmap_layer.defaultRadius, unknown_value);
     }
