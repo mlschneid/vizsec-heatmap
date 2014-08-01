@@ -25,8 +25,8 @@ window.addEvent('domready', function() {
     holder.ondrop = function (e) {
         this.className = '';
         e.preventDefault();
-        var minHeatValue = document.getElementById("minHeatValue").value;
-        var maxHeatValue = document.getElementById("maxHeatValue").value;
+        var minHeatValue = parseFloat(document.getElementById("minHeatValue").value);
+        var maxHeatValue = parseFloat(document.getElementById("maxHeatValue").value);
         //var intensityScalar = document.getElementById("scalar").value;
 
         var file = e.dataTransfer.files[0],
