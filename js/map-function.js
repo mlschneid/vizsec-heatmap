@@ -20,7 +20,7 @@ var osm_layer;
 var heatmap_layer;
 var parent_node;
 var nodes = {};
-var unknown_value = 0; //keeps track of greatest heatmap value that belongs to "Unknown" country.
+//var unknown_value = 0; //keeps track of greatest heatmap value that belongs to "Unknown" country.
 
 var ZOOM_LEVELS = 4;
 
@@ -92,6 +92,7 @@ function add_heatmap(){
 
 function populate_heatmap(csvContent, minHeat, maxHeat){
     data = [];
+    unknown_value = 0;
     get_all_nodes();
 
     var transformedData = { max: 1, data:[] };
