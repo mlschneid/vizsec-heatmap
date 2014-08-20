@@ -20,6 +20,9 @@ var osm_layer;
 var heatmap_layer;
 var parent_node;
 var nodes = {};
+var data = {};
+var minHeat = 0.05;
+var maxHeat = 1.0;
 //var unknown_value = 0; //keeps track of greatest heatmap value that belongs to "Unknown" country.
 
 var ZOOM_LEVELS = 4;
@@ -33,7 +36,7 @@ function get_all_nodes(){
     $('svg').find('.node').each(function(index){
         var title = $(this).children('title').text();
         nodes[title] = $(this);
-    }); 
+    });
 }
 
 function get_node(text) {
@@ -42,7 +45,7 @@ function get_node(text) {
 
 function get_all_labels(parent_node){
     var labels = [];
-    
+
     parent_node.find('.node').each(function(index){
         labels.push($(this).children('text').text());
     });
@@ -51,6 +54,10 @@ function get_all_labels(parent_node){
 }
 
 function highlight_node(name, radius, intensity) {
+    if (unknown_value < minHeat && unknown_value > maxHeat){
+        return;
+    }
+
     var ctm;
 
     var svg = $('svg')[0];
@@ -68,8 +75,8 @@ function highlight_node(name, radius, intensity) {
             ctm = txt.getTransformToElement(svg);
         }
         var transformed_point = pt.matrixTransform(ctm);
-        data.push({lonlat: new OpenLayers.LonLat(transformed_point.x, -1*transformed_point.y),
-                    count: intensity});
+
+        data[[transformed_point.x, -1*transformed_point.y]] = intensity;
     }
     else {
         if (unknown_value < intensity) {
@@ -90,8 +97,16 @@ function add_heatmap(){
     map.zoomToMaxExtent();
 }
 
-function populate_heatmap(csvContent, minHeat, maxHeat){
-    data = [];
+function populate_heatmap(csvContent, minHeat, maxHeat, linger){
+    if(linger == true)
+    {
+        for (var coordinate in data) {
+            data[coordinate] = minHeat;
+        }
+    }
+
+    minHeat = minHeat;
+    maxHeat = maxHeat;
     unknown_value = 0;
     get_all_nodes();
 
@@ -100,17 +115,25 @@ function populate_heatmap(csvContent, minHeat, maxHeat){
     for(var i = 0; i < csvContent.length; i++){
         var nodeId = csvContent[i][0];
         var intensityValue = csvContent[i][1];
-        if (intensityValue >= minHeat && intensityValue <= maxHeat)
-        {
-            highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue);
-        }
-    }
-    if (unknown_value >= minHeat && unknown_value <= maxHeat)
-    {
-        highlight_node("Unknown", heatmap_layer.defaultRadius, unknown_value);
+
+        highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue);
     }
 
-    transformedData.data = data;
+    highlight_node("Unknown", heatmap_layer.defaultRadius, unknown_value);
+
+    var accumulated_data = [];
+    for(var item in data){
+        var coordinates = item.split(",");
+        var x = parseFloat(coordinates[0]);
+        var y = parseFloat(coordinates[1]);
+            
+        accumulated_data.push({
+                lonlat: new OpenLayers.LonLat(x, y), 
+                count: data[item]
+        });
+    }
+
+    transformedData.data = accumulated_data;
     heatmap_layer.setDataSet(transformedData);
     heatmap_layer.redraw();
 }

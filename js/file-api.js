@@ -85,6 +85,6 @@ function processCSV(file){
         csvArray = $.csv.toArrays(csvfile);
         heat_title = document.getElementById("heat-title");
         heat_title.innerHTML = file.name.split(".")[0];
-        populate_heatmap(csvArray, 0.05, 1.0);
+        populate_heatmap(csvArray, 0.15, 1.0, true);
     };
 }
