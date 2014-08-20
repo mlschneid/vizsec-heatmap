@@ -1,5 +1,7 @@
 body {
     font-family: arial, serif;
+    margin:0;
+    padding:0;
 }
 #holder {
     border: 2px dashed #ccc;
@@ -7,6 +9,10 @@ body {
     height: 25px;
     margin: 0 auto;
     overflow:hidden;
+    position:absolute;
+    top:10px;
+    left:45%;
+    z-index:10;
 }
 
 #holder.hover {
@@ -24,7 +30,15 @@ body {
 #minMax { display:block-inline; padding-left:10px;}
 #minMax input { display:block; }
 
-#map { padding-top:10px!important; }
+#map { 
+    height:1080px;
+    width:1920px;
+    padding-top:10px!important;
+    position: absolute;
+    top:0px;
+    left:0px;
+
+}
 
 #heat-title {
     margin: 30px 0 0 150px;
