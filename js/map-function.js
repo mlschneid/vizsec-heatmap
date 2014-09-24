@@ -19,8 +19,8 @@ var gmapLayer;
 var osm_layer;
 var heatmap_layer;
 var parent_node;
-var nodes = {};
 var data = {};
+var nodes = {};
 var minHeat = 0.05;
 var maxHeat = 1.0;
 //var unknown_value = 0; //keeps track of greatest heatmap value that belongs to "Unknown" country.
@@ -53,29 +53,35 @@ function get_all_labels(parent_node){
     return labels;
 }
 
+function create_svg_point(node){
+    var ctm;
+    var svg = $('svg')[0];
+    var pt = svg.createSVGPoint();
+    var my_node = get_node(node);
+    if (my_node){
+        var text_element = my_node.children('text').first();
+        var x = text_element.attr('x');
+        var y = text_element.attr('y');
+        pt.x = x;
+        pt.y = y;
+        if (ctm == null){
+            var txt = text_element[0];
+            ctm = txt.getTransformToElement(svg);
+        }
+        
+        return pt.matrixTransform(ctm);
+    }
+    return null;
+}
+
 function highlight_node(name, radius, intensity) {
     if (unknown_value < minHeat && unknown_value > maxHeat){
         return;
     }
 
-    var ctm;
+    var transformed_point = create_svg_point(name);
 
-    var svg = $('svg')[0];
-    var pt = svg.createSVGPoint();
-
-    var node = get_node(name);
-    if (node) {
-        var text_element = node.children('text').first();
-        var x = text_element.attr('x');
-        var y = text_element.attr('y');
-        pt.x = x;
-        pt.y = y;
-        if (ctm == null) {
-            var txt = text_element[0];
-            ctm = txt.getTransformToElement(svg);
-        }
-        var transformed_point = pt.matrixTransform(ctm);
-
+    if (transformed_point != null){
         data[[transformed_point.x, -1*transformed_point.y]] = intensity;
     }
     else {
@@ -89,7 +95,12 @@ function add_heatmap(){
     osm_layer = new OpenLayers.Layer.OSM("heatmap-layer");
     heatmap_layer = new OpenLayers.Layer.Heatmap("heatmap",
             map, osm_layer,
-            {visible: true, radius:30},
+            {visible: true, radius: 15, 
+                gradient: {
+                    '.8': 'white',
+                    '.95' : 'red'                  
+                }
+            },
             {isBaseLayer: false, opacity: 0.7}
     );
 
@@ -97,45 +108,102 @@ function add_heatmap(){
     map.zoomToMaxExtent();
 }
 
-function populate_heatmap(csvContent, minHeat, maxHeat, linger){
-    if(linger == true)
-    {
-        for (var coordinate in data) {
-            data[coordinate] = minHeat;
-        }
+function standard(csvContent){
+    data = {};
+    
+    for(var i = 0; i < csvContent.length; i++){
+        var nodeId = csvContent[i][0];
+        var intensityValue = csvContent[i][1];
+
+        highlight_node(nodeId, heatmap_layer.defaultRadius, 
+                        intensityValue);
     }
 
-    minHeat = minHeat;
-    maxHeat = maxHeat;
-    unknown_value = 0;
-    get_all_nodes();
+    highlight_node("Unknown", heatmap_layer.defaultRadius, 
+                        unknown_value);
+}
 
-    var transformedData = { max: 1, data:[] };
+function decay(csvContent){
+    for(item in data){
+        if (data[item] <= 0.05){
+            data[item] = 0;
+        }
+        else{
+            data[item] = data[item] * 0.5;
+        }
+    }
 
     for(var i = 0; i < csvContent.length; i++){
         var nodeId = csvContent[i][0];
         var intensityValue = csvContent[i][1];
 
-        highlight_node(nodeId, heatmap_layer.defaultRadius, intensityValue);
+        highlight_node(nodeId, heatmap_layer.defaultRadius, 
+                        intensityValue);
     }
 
-    highlight_node("Unknown", heatmap_layer.defaultRadius, unknown_value);
+    highlight_node("Unknown", heatmap_layer.defaultRadius, 
+                        unknown_value);
+}
+
+function decay_linear(csvContent){
+    for(var item in data){
+        if (data[item] <= 0.05){
+            data[item] = 0;
+        }
+        else{
+            data[item] = data[item] - 0.15;
+        }
+    }
+
+    for(var i = 0; i < csvContent.length; i++){
+        var nodeId = csvContent[i][0];
+        var intensityValue = csvContent[i][1];
+
+        highlight_node(nodeId, heatmap_layer.defaultRadius, 
+                        intensityValue);
+    }
+
+    highlight_node("Unknown", heatmap_layer.defaultRadius, 
+                        unknown_value);
+}
+
+function cumulative(csvContent){
+    for(var i = 0; i < csvContent.length; i++){
+        var nodeId = csvContent[i][0];
+        var intensityValue = csvContent[i][1];
+        
+        highlight_node(nodeId, heatmap_layer.defaultRadius, 
+                        intensityValue);
+    }
+
+    highlight_node("Unknown", heatmap_layer.defaultRadius, 
+                        unknown_value);
+}
+
+function populate_heatmap(csvContent, minHeat, maxHeat, fp_HeatmapType){
+    minHeat = minHeat;
+    maxHeat = maxHeat;
+    unknown_value = 0;
+    get_all_nodes();
+
+    fp_HeatmapType(csvContent);
 
     var accumulated_data = [];
     for(var item in data){
         var coordinates = item.split(",");
         var x = parseFloat(coordinates[0]);
         var y = parseFloat(coordinates[1]);
-            
+
         accumulated_data.push({
-                lonlat: new OpenLayers.LonLat(x, y), 
+                lonlat: new OpenLayers.LonLat(x, y),
                 count: data[item]
         });
     }
 
+    var transformedData = { max: 1, data:[] };
     transformedData.data = accumulated_data;
     heatmap_layer.setDataSet(transformedData);
-    heatmap_layer.redraw();
+    rescale_heatmap();
 }
 
 function display_map(map_url, width, height) {
@@ -168,8 +236,8 @@ function display_map(map_url, width, height) {
 
 function rescale_heatmap() {
     if (heatmap_layer) {
-        heatmap_layer.defaultRadius = heatmap_scaling_factor * map.zoom;
-        heatmap_layer.redraw();
+        //heatmap_layer.defaultRadius = heatmap_scaling_factor * map.zoom;
+        //heatmap_layer.repaint();
     }
 }
 

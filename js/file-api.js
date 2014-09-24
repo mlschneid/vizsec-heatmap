@@ -59,7 +59,7 @@ window.addEvent('domready', function() {
         }
         // show single heatmap
         else if(files.length == 1 && extension == "csv"){
-            processCSV(files[0]);    
+            processCSV(files[0]);
         }
         // show "slideshow" of heatmaps
         else
@@ -84,7 +84,10 @@ function processCSV(file){
         var csvfile = event.target.result;
         csvArray = $.csv.toArrays(csvfile);
         heat_title = document.getElementById("heat-title");
-        heat_title.innerHTML = file.name.split(".")[0];
-        populate_heatmap(csvArray, 0.15, 1.0, true);
+        var ts = file.name.split(".")[0].split("-");
+        var year = [ts[0],ts[1],ts[2]].join("-");
+        var time = [ts[3],ts[4],ts[5]].join(":");
+        heat_title.innerHTML = year + " " + time;
+        populate_heatmap(csvArray, 0.15, 1.0, cumulative);
     };
 }
